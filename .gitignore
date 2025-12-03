@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Large Data & Models
+Model_PhoBERT/
+Model_PhoBERT_6_layers_backup/
+Data/
+Code/Web_Application/vncorenlp/
+
+# Environment
+.env
+venv/

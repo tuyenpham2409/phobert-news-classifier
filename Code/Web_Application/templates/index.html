@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NewsClassifier AI - Phân Loại Tin Tức</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#EC4899',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes blob {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(20px, -20px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            75% {
+                transform: translate(20px, 20px) scale(1.05);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out;
+        }
+
+        /* Custom scrollbar */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: #c7c7c7;
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+    </style>
+</head>
+
+<body
+    class="min-h-screen flex flex-col font-sans text-gray-900 bg-gray-50 selection:bg-primary/20 selection:text-primary">
+
+    <!-- Background Decor -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div
+            class="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob">
+        </div>
+        <div
+            class="absolute top-0 right-1/4 w-96 h-96 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000">
+        </div>
+        <div
+            class="absolute -bottom-8 left-1/3 w-96 h-96 bg-pink-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000">
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10 bg-white/50 backdrop-blur-md border-b border-gray-200 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-gradient-to-br from-primary to-secondary p-2 rounded-xl">
+                    <i class="fas fa-newspaper text-white text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold">
+                    News <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Classifier</span>
+                </h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 relative z-10">
+
+        <!-- Hero Section -->
+        <div class="text-center space-y-4 mb-12">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 shadow-sm mb-2">
+                <i class="fas fa-robot text-primary text-sm"></i>
+                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wide">PhoBERT Model Inspired</span>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                Phân Loại Tin Tức <br class="hidden md:block" />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Tiếng Việt Tự
+                    Động</span>
+            </h2>
+            <p class="text-gray-500 max-w-2xl mx-auto text-lg">
+                Hệ thống dự đoán thông minh hỗ trợ 10 chủ đề: Thể thao, Sức khỏe, Giáo dục, Pháp luật, Kinh doanh, Thư
+                giãn, Khoa học Công nghệ, Xe cộ, Đời sống và Thế giới.
+            </p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="transform transition-all hover:scale-[1.01] duration-500">
+            <div
+                class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-100/50 p-1 transition-all duration-300 border border-white">
+                <div class="p-6 md:p-8">
+                    <div class="flex justify-between items-end mb-4">
+                        <label class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-quote-left text-primary rotate-180"></i>
+                            Nhập nội dung tin tức
+                        </label>
+                        <span class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-500"
+                            id="charCount">
+                            0 ký tự
+                        </span>
+                    </div>
+
+                    <div class="relative group">
+                        <textarea id="newsInput"
+                            class="w-full h-64 p-6 text-gray-700 bg-gray-50/50 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary focus:outline-none resize-none transition-all text-lg leading-relaxed shadow-inner group-hover:bg-white"
+                            placeholder="Dán bài báo hoặc nội dung tin tức vào đây..."></textarea>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mt-6 justify-between items-center">
+                        <div class="hidden sm:flex gap-2 text-sm text-gray-400 italic">
+                            Ví dụ: Thể thao, Giáo dục, Kinh doanh...
+                        </div>
+
+                        <div class="flex gap-3 w-full sm:w-auto">
+                            <button id="clearBtn"
+                                class="flex-1 sm:flex-none px-6 py-3 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 font-semibold transition-all flex items-center justify-center gap-2 border border-transparent hover:border-gray-200">
+                                <i class="fas fa-eraser"></i>
+                                <span>Xóa</span>
+                            </button>
+                            <button id="classifyBtn"
+                                class="flex-1 sm:flex-none px-8 py-3 rounded-xl text-white font-bold shadow-lg shadow-primary/25 flex items-center justify-center gap-2 transition-all transform active:scale-95 bg-gradient-to-r from-primary to-indigo-600 hover:shadow-primary/40 hover:-translate-y-1">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Phân loại</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingSection" class="hidden">
+            <div class="text-center py-8">
+                <div
+                    class="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin">
+                </div>
+                <p class="mt-4 text-gray-600 font-medium">Đang xử lý...</p>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultSection" class="hidden scroll-mt-24">
+            <div
+                class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 animate-fade-in-up">
+                <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                    <h2
+                        class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                        Kết Quả Phân Loại
+                    </h2>
+                    <div
+                        class="px-4 py-2 rounded-full border flex items-center gap-2 text-sm font-semibold bg-green-100/50 border-green-200 text-green-600">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Tích cực</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Left Column: Category & Confidence -->
+                    <div class="lg:col-span-4 flex flex-col gap-4">
+                        <!-- Category Card -->
+                        <div id="categoryCard"
+                            class="rounded-2xl p-6 border flex flex-col items-center justify-center text-center h-full min-h-[250px] relative overflow-hidden transition-all hover:scale-[1.02] duration-300">
+                            <div class="absolute top-0 right-0 -mr-8 -mt-8 w-24 h-24 rounded-full bg-white opacity-20">
+                            </div>
+
+                            <div class="bg-white p-4 rounded-2xl shadow-sm mb-4" id="categoryIconContainer">
+                                <i id="categoryIcon" class="text-5xl"></i>
+                            </div>
+                            <p class="text-gray-500 font-medium text-sm uppercase tracking-widest mb-1">Chủ đề dự đoán
+                            </p>
+                            <h3 id="categoryLabel" class="text-3xl font-black"></h3>
+                        </div>
+
+                        <!-- Confidence Card -->
+                        <div class="bg-gray-50 rounded-2xl p-6 flex flex-col items-center justify-center relative">
+                            <div class="relative w-32 h-32">
+                                <svg class="transform -rotate-90 w-32 h-32">
+                                    <circle cx="64" cy="64" r="52" stroke="#ededed" stroke-width="12" fill="none">
+                                    </circle>
+                                    <circle id="progressCircle" cx="64" cy="64" r="52" stroke="#4F46E5"
+                                        stroke-width="12" fill="none" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+                                        stroke-linecap="round" class="transition-all duration-1000 ease-out"></circle>
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span id="confidenceText" class="text-2xl font-bold text-gray-800">0%</span>
+                                </div>
+                            </div>
+                            <span class="text-sm font-medium text-gray-500 mt-2">Độ chính xác</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Explanation -->
+                    <div class="lg:col-span-8">
+                        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 h-full">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="bg-yellow-100 p-2 rounded-lg">
+                                    <i class="fas fa-lightbulb text-yellow-600 text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Giải thích kết quả</h3>
+                            </div>
+
+                            <p class="text-gray-500 text-sm mb-4">
+                                Các từ được tô màu <span class="bg-yellow-200 px-1 rounded">đậm hơn</span> là các từ có
+                                ảnh hưởng lớn đến quyết định của mô hình.
+                            </p>
+
+                            <div id="explanationContainer"
+                                class="p-6 bg-gray-50 rounded-xl border border-gray-200 text-lg leading-loose text-gray-800 font-medium max-h-[500px] overflow-y-auto">
+                                <!-- Content will be injected here -->
+                                <p class="text-gray-400 italic text-center">Chưa có dữ liệu giải thích...</p>
+                            </div>
+
+                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                                <span>Trạng thái tách từ: <span id="segmentationStatusText"
+                                        class="font-medium">...</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Text with Highlighted Words -->
+        <div id="explanationText" class="hidden">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto relative z-10 border-t border-gray-200 bg-white/50 backdrop-blur-md">
+            <div class="max-w-5xl mx-auto py-8 px-4 text-center">
+                <p class="text-sm text-gray-500 font-medium">
+                    &copy; 2025 NLP Project Classification.
+                    <span class="mx-2 opacity-50">|</span>
+                    Powered by PhoBERT & Group 1
+                </p>
+            </div>
+        </footer>
+
+        <script src="/static/script.js?v=2"></script>
+</body>
+
+</html>

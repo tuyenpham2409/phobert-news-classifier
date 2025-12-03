@@ -1,0 +1,9 @@
+/* This file is now mostly empty as we use Tailwind CSS */
+/* Only custom utilities that Tailwind doesn't provide */
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Additional animations if needed */
