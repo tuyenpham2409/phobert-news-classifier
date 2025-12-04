@@ -57,11 +57,11 @@ uvicorn Code.Web_Application.app:app --reload
 ```
 Hoặc nếu bạn đang đứng trong thư mục `Code/Web_Application`:
 ```bash
-uvicorn app:app --reload
+uvicorn app:app --reload (ưu tiên)
 ```
 
 ### Bước 4: Sử Dụng
-Mở trình duyệt và truy cập: [http://localhost:8000](http://localhost:8000)
+CTRL + Click vào liên kết ở terminal sau đó hiển thị web ở trình duyệt:
 
 1.  Nhập nội dung tin tức vào ô văn bản.
 2.  Nhấn nút **"Phân Loại"**.
