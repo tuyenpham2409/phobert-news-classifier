@@ -115,95 +115,95 @@ async def predict(input_data: TextInput):
     if not text:
         return {"label": "Error", "confidence": 0.0}
 
-    # IMPORTANT: Preprocess text (clean + word segmentation)
+    # 1. Tiền xử lý (Clean + Tách từ VnCoreNLP)
     processed_text = preprocess(text)
     
-    # Tokenize the PROCESSED text
-    inputs = tokenizer(processed_text, padding=True, truncation=True, max_length=256, return_tensors="pt")
-    inputs = {k: v.to(device) for k, v in inputs.items()}
+    # 2. Tạo danh sách các từ (Word List)
+    word_list = processed_text.split()
+    
+    # 3. Tokenize
+    encoding = tokenizer(
+        word_list, 
+        is_split_into_words=True, 
+        padding=True, 
+        truncation=True, 
+        max_length=256, 
+        return_tensors="pt"
+    )
+    inputs = {k: v.to(device) for k, v in encoding.items()}
 
-    # Inference
+    # 4. Inference & Lấy Attention
     with torch.no_grad():
         outputs = model(**inputs, output_attentions=True)
         logits = outputs.logits
         probabilities = torch.softmax(logits, dim=1)
         confidence, predicted_class = torch.max(probabilities, dim=1)
         
-        # Get attention from the last layer
-        # attentions is a tuple of (batch_size, num_heads, sequence_length, sequence_length)
-        # We take the last layer: outputs.attentions[-1]
+        # Lấy Attention của lớp cuối cùng và trung bình cộng các heads
         last_layer_attention = outputs.attentions[-1]
-        
-        # Average across heads: (batch_size, sequence_length, sequence_length)
         avg_attention = torch.mean(last_layer_attention, dim=1)
         
-        # Get attention of [CLS] token (index 0) to all other tokens
-        # Shape: (sequence_length,)
-        cls_attention = avg_attention[0, 0, :]
-        
-        # Normalize attention scores
-        cls_attention = cls_attention / cls_attention.sum()
-        
-        # Get tokens and their scores
-        # IMPORTANT: Convert tensor to list for tokenizer
-        input_ids = inputs['input_ids'][0].cpu().tolist()
-        tokens = tokenizer.convert_ids_to_tokens(input_ids)
-        token_scores = cls_attention.tolist()
-        
-        # DEBUG: Print tokens and scores
-        # print(f"DEBUG: Tokens: {tokens}")
-        # print(f"DEBUG: Scores: {token_scores}")
-        
-        # Reconstruct words and aggregate scores
-        words_with_scores = []
-        current_word = ""
-        current_score = 0.0
-        count = 0
-        
-        for token, score in zip(tokens, token_scores):
-            if token in ['<s>', '</s>', '<pad>']:
-                continue
-                
-            # Handle subword tokens (PhoBERT uses @@ for subwords usually, or standard BPE)
-            # PhoBERT tokenizer typically uses @@ to indicate continuation or BPE style
-            # Let's handle the standard "@@" suffix for subwords in PhoBERT
-            
-            clean_token = token.replace('@@', '')
-            
-            if token.endswith('@@'):
-                current_word += clean_token
-                current_score += score
-                count += 1
-            else:
-                # End of a word
-                current_word += clean_token
-                current_score += score
-                count += 1
-                
-                # Normalize score by number of subwords (optional, but good for stability)
-                # Or just take the sum. Let's take the sum as "total attention paid to this word"
-                words_with_scores.append({
-                    "word": current_word.replace('_', ' '), # Replace underscore with space for display
-                    "score": current_score
-                })
-                
-                current_word = ""
-                current_score = 0.0
-                count = 0
+        # Lấy sự chú ý của token [CLS]
+        cls_attention = avg_attention[0, 0, :] 
 
+    # 5. Gộp điểm Attention từ Token về Word
+    # Manual mapping vì không có Fast Tokenizer
+    input_ids = inputs['input_ids'][0].cpu().tolist()
+    tokens = tokenizer.convert_ids_to_tokens(input_ids)
+    
+    word_ids = [None] # Token đầu tiên là <s>
+    
+    current_token_idx = 1
+    for i, word in enumerate(word_list):
+        if current_token_idx >= len(tokens) - 1: 
+            break
+            
+        sub_tokens = tokenizer.tokenize(word)
+        
+        for _ in sub_tokens:
+            if current_token_idx < len(tokens) - 1:
+                word_ids.append(i)
+                current_token_idx += 1
+            else:
+                break
+                
+    while len(word_ids) < len(tokens):
+        word_ids.append(None) 
+    
+    # Cộng dồn điểm attention
+    word_scores = {}
+    token_scores = cls_attention.tolist()
+    
+    for idx, word_id in enumerate(word_ids):
+        if word_id is None:
+            continue
+            
+        if word_id not in word_scores:
+            word_scores[word_id] = 0.0
+            
+        word_scores[word_id] += token_scores[idx]
+
+    # 6. Tạo danh sách kết quả
+    explanation_list = []
+    
+    for idx, word in enumerate(word_list):
+        score = word_scores.get(idx, 0.0)
+        display_word = word.replace("_", " ")
+        
+        explanation_list.append({
+            "word": display_word,
+            "score": score
+        })
+
+    # 7. Trả về kết quả
     predicted_label = LABEL_MAP.get(predicted_class.item(), "Unknown")
     confidence_score = confidence.item()
-
-    # DEBUG: Print result summary
-    print(f"DEBUG: Generated {len(words_with_scores)} explanation words")
-    if len(words_with_scores) > 0:
-        print(f"DEBUG: Top word: {words_with_scores[0]}")
 
     return {
         "label": predicted_label,
         "confidence": f"{confidence_score:.2%}",
-        "segmentation_status": "Đã tách từ (VnCoreNLP)" if rdrsegmenter else "Chưa tách từ (Thiếu Java/VnCoreNLP)",
-        "explanation": words_with_scores
+        "segmentation_status": "Đã tách từ (VnCoreNLP)" if rdrsegmenter else "Chưa tách từ (Cảnh báo)",
+        "explanation": explanation_list
     }
 
 if __name__ == "__main__":

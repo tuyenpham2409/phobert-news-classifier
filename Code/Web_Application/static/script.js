@@ -230,22 +230,19 @@ function renderExplanation(wordsWithScores) {
         const { word, score } = item;
 
         // Normalize score 0-1 relative to max score
-        // Use a power function to make differences more visible
-        const normalizedScore = Math.pow(score / maxScore, 0.7);
+        // Use a power function (0.5) to make differences more visible but less extreme
+        const normalizedScore = Math.pow(score / maxScore, 0.5);
 
         const span = document.createElement('span');
         span.textContent = word + ' ';
         span.className = 'inline-block rounded px-1 mx-0.5 transition-all duration-300 hover:scale-110 cursor-default';
 
-        // Calculate background color (Yellow/Orange)
-        // We only highlight if score is significant enough
-        if (normalizedScore > 0.1) {
-            // R: 255, G: 215, B: 0 (Gold) -> R: 255, G: 165, B: 0 (Orange)
-            // Alpha based on score
-            const alpha = Math.min(normalizedScore * 0.8, 1.0); // Cap alpha
-            span.style.backgroundColor = `rgba(255, 200, 0, ${alpha})`;
-
-            // Tooltip for score
+        // Highlight words with significant scores
+        // Threshold 0.05 allows more context words to be highlighted
+        if (normalizedScore > 0.05) {
+            const alpha = Math.min(normalizedScore, 0.8);
+            span.style.backgroundColor = `rgba(255, 215, 0, ${alpha})`; // Gold color
+            span.style.fontWeight = '500';
             span.title = `Độ quan trọng: ${(normalizedScore * 100).toFixed(1)}%`;
         }
 
