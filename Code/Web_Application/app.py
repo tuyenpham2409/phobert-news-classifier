@@ -78,13 +78,35 @@ LABEL_MAP = {
 
 # Text preprocessing functions (same as Colab)
 def clean_text(text):
-    """Clean and normalize Vietnamese text"""
+    """
+    Hàm làm sạch dữ liệu chuyên sâu, xử lý các lỗi dính từ đặc thù của tiếng Việt.
+    (Updated to match preprocess_vnexpress_data.ipynb)
+    """
+    if not isinstance(text, str): return ""
+
+    # 1. XÓA RÁC CÔNG NGHỆ (Link, Email, Hashtag, Username)
+    text = re.sub(r'https?://\S+|www\.\S+', ' ', text)
+    text = re.sub(r'\S+@\S+', ' ', text)
+    text = re.sub(r'(?:instagram|tiktok|facebook|twitter)/[\w.-]+', ' ', text)
+    text = re.sub(r'<.*?>', ' ', text)
+
+    # 2. XỬ LÝ DÍNH TỪ (CamelCase) - Vấn đề "MỹBức", "Thái LanViệc"
+    text = re.sub(r'(?<=[a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])(?=[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ])', ' ', text)
+
+    # 3. XỬ LÝ DÍNH SỐ (Smart Number Splitting)
+    text = re.sub(r'(?<=\d)(?=[a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])', ' ', text)
+    text = re.sub(r'(?<=[a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ])(?=\d)', ' ', text)
+
+    # 4. CHUẨN HÓA KÝ TỰ PHÂN CÁCH
+    text = re.sub(r'[\n\r\t]', ' ', text)
+    text = re.sub(r'(?<=[a-zA-Z])[-:](?=[a-zA-Z])', ' ', text)
+
+    # 5. CHUẨN HÓA CUỐI CÙNG
     text = text.lower()
-    text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
-    text = re.sub(r'http\S+', '', text)  # Remove URLs
-    # Keep Vietnamese characters and basic punctuation
-    text = re.sub(r'[^\w\sàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ0-9.,?!]', ' ', text)
+    text = re.sub(r'[^\w\sàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ0-9.,?!%]', ' ', text)
+    text = re.sub(r'([.,?!])', r' \1 ', text)
     text = re.sub(r'\s+', ' ', text).strip()
+
     return text
 
 def preprocess(text):
