@@ -14,7 +14,38 @@ Dự án này sử dụng mô hình **PhoBERT** (được fine-tune) để phân
 *   **Giải thích kết quả (Explainability)**: Hiển thị mức độ quan trọng của từng từ trong việc đưa ra quyết định (dựa trên cơ chế Attention của BERT).
 *   **Tách từ tiếng Việt (Word Segmentation)**: Tích hợp sẵn **VnCoreNLP** để xử lý ngôn ngữ tiếng Việt chính xác nhất.
 
-## 📂 Cấu Trúc Dự Án
+## � Kết Quả Thực Nghiệm & Mô Hình
+
+Dự án đã thực hiện huấn luyện và đánh giá mô hình PhoBERT trên bộ dữ liệu tin tức VnExpress. Dưới đây là các thông số chi tiết:
+
+### 1. Dữ Liệu (Dataset)
+*   **Nguồn**: VnExpress
+*   **Số lượng**: ~14,000 bài báo (sau khi làm sạch và loại bỏ trùng lặp).
+*   **Phân chia**: Train (80%) - Validation (10%) - Test (10%).
+*   **Xử lý văn bản**:
+    *   Làm sạch HTML tags, links, emails, ký tự đặc biệt.
+    *   Tách từ (Word Segmentation) sử dụng **VnCoreNLP**.
+
+### 2. Hiệu Năng Mô Hình (Performance)
+Kết quả đánh giá trên tập **Test (1.373 mẫu)** sau 4 epochs huấn luyện:
+
+| Metric | Giá Trị (Value) |
+| :--- | :--- |
+| **Accuracy** | **93.95%** |
+| **F1-Score** | **93.95%** |
+| **Precision** | **93.97%** |
+| **Recall** | **93.95%** |
+
+*Mô hình đạt độ chính xác cao và đồng đều trên cả 10 nhãn phân loại.*
+
+### 3. Cấu Hình Huấn Luyện
+*   **Model**: `vinai/phobert-base`
+*   **Learning Rate**: 2e-5
+*   **Batch Size**: 16 (Train) / 32 (Eval)
+*   **Epochs**: 4
+*   **Hardware**: GPU T4 (Google Colab)
+
+## �📂 Cấu Trúc Dự Án
 
 ```
 NLP Project/
