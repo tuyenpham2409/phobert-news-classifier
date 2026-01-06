@@ -194,8 +194,26 @@ Mặc dù PhoBERT nặng và cần GPU, nhưng **accuracy +15% so với baseline
 2. Thêm Classification Head (768 → 10 classes)
            ↓
 3. Fine-tune trên dữ liệu VnExpress (3 epochs)
-           ↓
-4. Đánh giá trên test set → 93.52% accuracy ⭐
+          ### 4.4. Phân tích kết quả Training (Training Results)
+
+**Giải thích ý nghĩa Log Training:**
+Ví dụ log: `Epoch 1 Complete | Train Loss: 0.5123 | Val Accuracy: 0.8234`
+
+1.  **Epoch 1 Complete**:
+    -   Mô hình đã học xong toàn bộ tập dữ liệu huấn luyện (Train set) đúng một lần. Máy đã "đọc qua sách giáo khoa" một lượt.
+
+2.  **Train Loss: 0.5123 (Sai số huấn luyện)**:
+    -   Đây là điểm số đo lường mức độ sai lệch của mô hình khi học.
+    -   Số càng nhỏ càng tốt (0 là hoàn hảo).
+    -   0.5123 cho thấy mô hình đang học khá tốt, nhưng vẫn còn dư địa để cải thiện.
+
+3.  **Val Accuracy: 0.8234 (Độ chính xác kiểm thử)**:
+    -   Đây là **chỉ số quan trọng nhất**. Nó cho biết nếu đưa 100 bài báo mới tinh (chưa từng gặp) cho mô hình, nó sẽ đoán đúng chủ đề của **82 bài**.
+    -   **Tại sao cần Validation Accuracy?**:
+        -   Giống như việc thi thử. Nếu chỉ nhìn Train Loss (làm bài tập về nhà) thì có thể mô hình chỉ "học vẹt" (nhớ đáp án).
+        -   Validation set là bộ đề thi bí mật. Điểm cao ở đây (82.34%) chứng tỏ mô hình **thực sự hiểu** bản chất của ngôn ngữ và phân loại tin tức, chứ không chỉ học thuộc lòng.
+
+### 4.5. Đánh giá trên Test Set → 93.52% accuracy ⭐
            ↓
 5. Deploy lên Web với FastAPI
 ```
@@ -469,6 +487,21 @@ df.to_csv('Data/vnexpress_processed_vncorenlp_for_phobert.csv', index=False)
 - **Attention heads:** 12
 - **Số tham số:** ~135 triệu parameters
 - **Vocabulary size:** 64,001 tokens (BPE)
+
+**Giải thích chi tiết các tham số:**
+-   **12 Layers (Độ sâu tư duy)**: Model gồm 12 lớp Encoder xếp chồng lên nhau. Lớp đầu tiên học các đặc trưng đơn giản (từ vựng), càng lên cao model càng hiểu sâu về ngữ nghĩa và ngữ cảnh (ví dụ phân biệt được "đường" ăn và "đường" đi).
+-   **768 Hidden Size (Độ rộng tư duy)**: Mỗi từ (token) được biểu diễn bởi một vector 768 chiều (768 con số thực). Kích thước này đủ lớn để mã hóa vô số sắc thái nghĩa của ngôn ngữ tiếng Việt.
+
+**Quy trình tính toán Inference (Dự báo):**
+1.  **Input**: Câu văn được chuyển thành Token IDs.
+2.  **PhoBERT Processing**: Đi qua 12 layers, tạo ra vector đại diện câu h[CLS] kích thước 1 × 768.
+3.  **Linear Layer (Tính Logits)**: Thực hiện phép nhân ma trận:
+    Logits = (h[CLS] × W) + b
+    Trong đó W là ma trận trọng số kích thước 768 × 10.
+    *Kết quả*: Ra được 10 con số thô (Logits), ví dụ: `[2.5, -1.2, 8.9, ...]`.
+4.  **Softmax (Tính Xác suất)**: Chuẩn hóa Logits về khoảng (0, 1) theo công thức e mũ:
+    P_i = exp(z_i) / Tổng(exp(z_j))
+    *Kết quả*: Tìm ra nhãn có xác suất cao nhất (Ví dụ: KINH DOANH 98%).
 
 **Kiến trúc sau khi Fine-tune:**
 ```
