@@ -8,13 +8,13 @@ Dự án này sử dụng mô hình **PhoBERT** (được fine-tune) để phân
 ![Kết quả phân loại](demo_result.png)
 *(Kết quả phân loại và giải thích từ khóa)*
 
-## 🚀 Tính Năng
+##  Tính Năng
 
 *   **Phân loại văn bản tự động**: Nhập tiêu đề hoặc nội dung tin tức, hệ thống sẽ dự đoán chủ đề.
 *   **Giải thích kết quả (Explainability)**: Hiển thị mức độ quan trọng của từng từ trong việc đưa ra quyết định (dựa trên cơ chế Attention của BERT).
 *   **Tách từ tiếng Việt (Word Segmentation)**: Tích hợp sẵn **VnCoreNLP** để xử lý ngôn ngữ tiếng Việt chính xác nhất.
 
-## � Kết Quả Thực Nghiệm & Mô Hình
+##  Kết Quả Thực Nghiệm & Mô Hình
 
 Dự án đã thực hiện huấn luyện và đánh giá mô hình PhoBERT trên bộ dữ liệu tin tức VnExpress. Dưới đây là các thông số chi tiết:
 
@@ -45,7 +45,7 @@ Kết quả đánh giá trên tập **Test (1.373 mẫu)** sau 4 epochs huấn l
 *   **Epochs**: 4
 *   **Hardware**: GPU T4 (Google Colab)
 
-## �📂 Cấu Trúc Dự Án
+##  Cấu Trúc Dự Án
 
 ```
 NLP Project/
@@ -60,7 +60,7 @@ NLP Project/
 └── requirements.txt       # Danh sách thư viện cần thiết
 ```
 
-## 🛠️ Cài Đặt & Chạy Ứng Dụng
+##  Cài Đặt & Chạy Ứng Dụng
 
 ### Bước 1: Cài đặt môi trường
 Yêu cầu Python 3.8 trở lên. Cài đặt các thư viện cần thiết:
@@ -98,7 +98,7 @@ CTRL + Click vào liên kết ở terminal sau đó hiển thị web ở trình 
 2.  Nhấn nút **"Phân Loại"**.
 3.  Xem kết quả chủ đề và biểu đồ giải thích các từ khóa quan trọng.
 
-## 📊 Các Nhãn Phân Loại (10 Chủ Đề)
+##  Các Nhãn Phân Loại (10 Chủ Đề)
 0.  Thể thao
 1.  Sức khỏe
 2.  Giáo dục
@@ -110,6 +110,6 @@ CTRL + Click vào liên kết ở terminal sau đó hiển thị web ở trình 
 8.  Đời sống
 9.  Thế giới
 
-## 📝 Ghi Chú
+##  Ghi Chú
 *   Model PhoBERT cần GPU để chạy nhanh nhất, nhưng vẫn hoạt động tốt trên CPU (thời gian dự đoán khoảng 1-2 giây).
 *   Nếu gặp lỗi "Java not found", hãy đảm bảo máy tính đã cài đặt **Java Runtime Environment (JRE)** để chạy VnCoreNLP.
